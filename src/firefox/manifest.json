@@ -1,11 +1,11 @@
 {
   "manifest_version": 2,
-  "name": "Scry Kingdom",
-  "version": "1.0.1",
-  "description": "Adds Card Kingdom purchase links to Scryfall",
+  "name": "ScryBuy",
+  "version": "1.1.0",
+  "description": "Adds store purchase links to Scryfall",
   "browser_specific_settings": {
     "gecko": {
-      "id": "scry-kingdom@zabenn.github.io",
+      "id": "scrybuy@zabenn.github.io",
       "data_collection_permissions": {
         "required": ["none"]
       }
@@ -18,6 +18,7 @@
   },
   "permissions": [
     "https://api.scryfall.com/*",
+    "https://manapool.com/*",
     "https://www.cardkingdom.com/*"
   ],
   "background": {
@@ -28,7 +29,8 @@
     {
       "matches": ["https://scryfall.com/card/*"],
       "js": ["contentScript.js"],
-      "css": ["index.css"]
+      "css": ["index.css"],
+      "run_at": "document_start"
     }
   ]
 }

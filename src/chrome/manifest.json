@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "Scry Kingdom",
-  "version": "1.0.1",
+  "name": "ScryBuy",
+  "version": "1.1.0",
   "description": "Adds Card Kingdom purchase links to Scryfall",
   "icons": {
     "48": "icons/icon-blue48.png",
@@ -11,16 +11,19 @@
   "permissions": [],
   "host_permissions": [
     "https://api.scryfall.com/*",
+    "https://manapool.com/*",
     "https://www.cardkingdom.com/*"
   ],
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "background.js",
+    "persistent": true
   },
   "content_scripts": [
     {
       "matches": ["https://scryfall.com/card/*"],
       "js": ["contentScript.js"],
-      "css": ["index.css"]
+      "css": ["index.css"],
+      "run_at": "document_start"
     }
   ]
 }
