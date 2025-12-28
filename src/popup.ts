@@ -1,54 +1,68 @@
 import browser from "webextension-polyfill";
 import { Options, defaultOptions } from "./types";
 
-const tcgPlayer = document.getElementById("tcgPlayer") as HTMLInputElement;
-const manaPool = document.getElementById("manaPool") as HTMLInputElement;
-const cardKingdom = document.getElementById("cardKingdom") as HTMLInputElement;
-const cardmarket = document.getElementById("cardmarket") as HTMLInputElement;
-const cardhoarder = document.getElementById("cardhoarder") as HTMLInputElement;
-
-const hideWhileLoading = document.getElementById(
-  "hideWhileLoading"
+const tcgPlayerElement = document.getElementById(
+  "tcg-player"
 ) as HTMLInputElement;
-const multicolor = document.getElementById("multicolor") as HTMLInputElement;
+const manaPoolElement = document.getElementById(
+  "mana-pool"
+) as HTMLInputElement;
+const cardKingdomElement = document.getElementById(
+  "card-kingdom"
+) as HTMLInputElement;
+const cardmarketElement = document.getElementById(
+  "cardmarket"
+) as HTMLInputElement;
+const cardhoarderElement = document.getElementById(
+  "cardhoarder"
+) as HTMLInputElement;
 
-async function main() {
-  const options = (await browser.storage.sync.get(defaultOptions)) as Options;
+const hideWhileLoadingElement = document.getElementById(
+  "hide-while-loading"
+) as HTMLInputElement;
+const multicolorElement = document.getElementById(
+  "multicolor"
+) as HTMLInputElement;
 
-  tcgPlayer.checked = options.vendors.tcgPlayer;
-  manaPool.checked = options.vendors.manaPool;
-  cardKingdom.checked = options.vendors.cardKingdom;
-  cardmarket.checked = options.vendors.cardmarket;
-  cardhoarder.checked = options.vendors.cardhoarder;
-  hideWhileLoading.checked = options.hideWhileLoading;
-  multicolor.checked = options.multicolor;
-
-  tcgPlayer.addEventListener("change", save);
-  manaPool.addEventListener("change", save);
-  cardKingdom.addEventListener("change", save);
-  cardmarket.addEventListener("change", save);
-  cardhoarder.addEventListener("change", save);
-
-  hideWhileLoading.addEventListener("change", save);
-  multicolor.addEventListener("change", save);
-}
-
-async function save() {
+async function onToggleChanged(element: HTMLInputElement) {
   const options: Options = {
     vendors: {
-      tcgPlayer: tcgPlayer.checked,
-      manaPool: manaPool.checked,
-      cardKingdom: cardKingdom.checked,
-      cardmarket: cardmarket.checked,
-      cardhoarder: cardhoarder.checked,
+      tcgPlayer: tcgPlayerElement.checked,
+      manaPool: manaPoolElement.checked,
+      cardKingdom: cardKingdomElement.checked,
+      cardmarket: cardmarketElement.checked,
+      cardhoarder: cardhoarderElement.checked,
     },
-    hideWhileLoading: hideWhileLoading.checked,
-    multicolor: multicolor.checked,
+    hideWhileLoading: hideWhileLoadingElement.checked,
+    multicolor: multicolorElement.checked,
   };
 
-  console.log("Saving options", options);
-
   await browser.storage.sync.set(options);
+
+  element.ariaPressed = element.checked.toString();
+}
+
+function setupToggleButton(element: HTMLInputElement, checked: boolean) {
+  element.checked = checked;
+  element.ariaPressed = checked.toString();
+  element.addEventListener("change", () => onToggleChanged(element));
+}
+
+async function main() {
+  document.body.classList.toggle(
+    "dark",
+    window.matchMedia("(prefers-color-scheme: dark)").matches
+  );
+
+  const options = (await browser.storage.sync.get(defaultOptions)) as Options;
+
+  setupToggleButton(tcgPlayerElement, options.vendors.tcgPlayer);
+  setupToggleButton(manaPoolElement, options.vendors.manaPool);
+  setupToggleButton(cardKingdomElement, options.vendors.cardKingdom);
+  setupToggleButton(cardmarketElement, options.vendors.cardmarket);
+  setupToggleButton(cardhoarderElement, options.vendors.cardhoarder);
+  setupToggleButton(hideWhileLoadingElement, options.hideWhileLoading);
+  setupToggleButton(multicolorElement, options.multicolor);
 }
 
 main();

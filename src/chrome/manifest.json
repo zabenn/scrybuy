@@ -1,22 +1,21 @@
 {
   "manifest_version": 3,
   "name": "ScryBuy",
-  "version": "1.1.0",
-  "description": "Adds Card Kingdom purchase links to Scryfall",
+  "version": "2.0.0",
+  "description": "Adds and hides purchase links on Scryfall",
   "icons": {
-    "48": "icons/icon-blue48.png",
-    "96": "icons/icon-blue96.png",
-    "128": "icons/icon-blue128.png"
+    "48": "icons/icon48.png",
+    "96": "icons/icon96.png",
+    "128": "icons/icon128.png"
   },
-  "permissions": [],
+  "permissions": ["storage"],
   "host_permissions": [
     "https://api.scryfall.com/*",
     "https://manapool.com/*",
     "https://www.cardkingdom.com/*"
   ],
   "background": {
-    "service_worker": "background.js",
-    "persistent": true
+    "service_worker": "background.js"
   },
   "content_scripts": [
     {
@@ -26,9 +25,10 @@
       "run_at": "document_start"
     }
   ],
-  "options_ui": {
-    "page": "options.html",
-    "open_in_tab": true
-  },
-  "options_page": "options.html"
+  "action": {
+    "default_title": "ScryBuy",
+    "default_area": "navbar",
+    "default_popup": "popup.html",
+    "default_icon": "icons/icon128.png"
+  }
 }

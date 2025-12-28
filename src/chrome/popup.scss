@@ -1,0 +1,26 @@
+body {
+  display: flex;
+  flex-direction: column;
+  font: menu;
+  font-size: 14.6667px;
+  background: white;
+  color: #333337;
+  margin: 4px;
+  width: 16em;
+  label {
+    padding: 0.25em 0.5em;
+  }
+  hr {
+    height: 1px;
+    background-color: #cccccd;
+    margin: 4px 0;
+    border: none;
+  }
+  &.dark {
+    background: #36363a;
+    color: white;
+    hr {
+      background-color: #69696c;
+    }
+  }
+}

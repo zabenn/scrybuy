@@ -28,7 +28,15 @@ async function main() {
   addScryfallStoreButtons(options, catalog, document);
   addScryfallPrintButtons(options, document);
 
-  if (!options.hideWhileLoading) {
+  if (
+    !options.hideWhileLoading ||
+    (options.vendors.cardKingdom &&
+      (document.URL.includes("forest") ||
+        document.URL.includes("island") ||
+        document.URL.includes("mountain") ||
+        document.URL.includes("plains") ||
+        document.URL.includes("swamp")))
+  ) {
     document.documentElement.classList.remove("loading");
   }
 

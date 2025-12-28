@@ -1,20 +1,20 @@
 {
   "manifest_version": 2,
   "name": "ScryBuy",
-  "version": "1.1.0",
-  "description": "Adds store purchase links to Scryfall",
+  "version": "2.0.0",
+  "description": "Adds and hides purchase links on Scryfall",
   "browser_specific_settings": {
     "gecko": {
-      "id": "scrybuy@zabenn.github.io",
+      "id": "scry-kingdom@zabenn.github.io",
       "data_collection_permissions": {
         "required": ["none"]
       }
     }
   },
   "icons": {
-    "48": "icons/icon-blue.svg",
-    "96": "icons/icon-blue.svg",
-    "128": "icons/icon-blue.svg"
+    "48": "icons/icon.svg",
+    "96": "icons/icon.svg",
+    "128": "icons/icon.svg"
   },
   "permissions": [
     "storage",
@@ -35,15 +35,16 @@
     }
   ],
   "browser_action": {
-    "default_icon": "icons/icon-blue.svg",
+    "default_title": "ScryBuy",
+    "default_area": "navbar",
+    "default_popup": "popup.html",
+    "default_icon": "icons/icon.svg",
     "theme_icons": [
       {
         "light": "icons/icon-white.svg",
         "dark": "icons/icon-black.svg",
         "size": 32
       }
-    ],
-    "default_title": "ScryBuy",
-    "default_popup": "popup.html"
+    ]
   }
 }

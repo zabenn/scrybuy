@@ -1,14 +1,14 @@
 {
   "name": "scrybuy",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "license": "GPL-3.0-only",
   "scripts": {
     "build": "pnpm build:chrome && pnpm build:firefox",
-    "build:chrome": "OUTDIR=dist/chrome MANIFEST=src/chrome/manifest.json bash -c 'pnpm run esbuild && pnpm run sass && pnpm run copyfiles'",
-    "build:firefox": "OUTDIR=dist/firefox MANIFEST=src/firefox/manifest.json bash -c 'pnpm run esbuild && pnpm run sass && pnpm run copyfiles'",
-    "copyfiles": "copyfiles -u 1 src/popup.html src/icons/*.{png,svg} $OUTDIR && copyfiles -u 2 $MANIFEST $OUTDIR",
+    "build:chrome": "OUTDIR=dist/chrome INDIR=src/chrome bash -c 'pnpm run esbuild && pnpm run sass && pnpm run copyfiles'",
+    "build:firefox": "OUTDIR=dist/firefox INDIR=src/firefox bash -c 'pnpm run esbuild && pnpm run sass && pnpm run copyfiles'",
+    "copyfiles": "copyfiles -u 1 src/popup.html src/icons/*.{png,svg} $OUTDIR && copyfiles -u 2 $INDIR/manifest.json $OUTDIR",
     "esbuild": "esbuild src/background.ts src/contentScript.ts src/popup.ts --bundle --outdir=$OUTDIR --format=iife",
-    "sass": "sass src/index.scss $OUTDIR/index.css --no-source-map",
+    "sass": "sass src:$OUTDIR $INDIR:$OUTDIR --no-source-map",
     "zip": "pnpm zip:chrome && pnpm zip:firefox",
     "zip:chrome": "pnpm build:chrome && cd dist/chrome && bestzip ../scrybuy-chrome.zip *",
     "zip:firefox": "pnpm build:firefox && cd dist/firefox && bestzip ../scrybuy-firefox.zip *"

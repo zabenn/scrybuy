@@ -4,7 +4,7 @@ browser.runtime.onMessage.addListener((message: any) => {
   if (message.action === "fetchUrl") {
     return fetch(message.url, {
       headers: {
-        "User-Agent": "ScryBuy/1.1.0",
+        "User-Agent": "ScryBuy/2.0.0",
       },
     }).then((response) => {
       if (response.ok) {

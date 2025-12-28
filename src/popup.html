@@ -1,29 +1,35 @@
 <!doctype html>
 <html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="popup.css" />
+  </head>
   <body>
-    <fieldset>
-      <legend>Vendors</legend>
-      <label
-        ><input type="checkbox" id="tcgPlayer" /> <span>TCGplayer</span></label
-      >
-      <label
-        ><input type="checkbox" id="manaPool" /> <span>Mana Pool</span></label
-      >
-      <label
-        ><input type="checkbox" id="cardKingdom" />
-        <span>Card Kingdom</span></label
-      >
-      <label
-        ><input type="checkbox" id="cardmarket" />
-        <span>Card Market</span></label
-      >
-      <labellabellabel
-        ><input type="checkbox" id="cardhoarder" />
-        <span>Card Hoarder</span></label
-      >
-    </fieldset>
     <label
-      ><input type="checkbox" id="hideWhileLoading" />
+      ><input class="toggle-button" type="checkbox" id="tcg-player" />
+      <span>TCGplayer</span></label
+    >
+    <label
+      ><input class="toggle-button" type="checkbox" id="mana-pool" />
+      <span>Mana Pool</span></label
+    >
+    <label
+      ><input class="toggle-button" type="checkbox" id="card-kingdom" />
+      <span>Card Kingdom</span></label
+    >
+    <hr />
+    <label
+      ><input class="toggle-button" type="checkbox" id="cardmarket" />
+      <span>Cardmarket</span></label
+    >
+    <hr />
+    <label
+      ><input class="toggle-button" type="checkbox" id="cardhoarder" />
+      <span>Cardhoarder</span></label
+    >
+    <hr />
+    <label
+      ><input type="checkbox" id="hide-while-loading" />
       <span>Hide while loading</span></label
     >
     <label

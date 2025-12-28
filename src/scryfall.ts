@@ -26,9 +26,8 @@ export async function getScryfallCards(
 ): Promise<Record<string, Card>> {
   setAgent("ScryBuy", "1.1.0");
 
-  const printsElement = document.querySelector(".prints")!;
   const tableElement = Array.from(
-    printsElement.querySelectorAll("table.prints-table")
+    document.querySelector(".prints")!.querySelectorAll("table.prints-table")
   ).find((table) => table.textContent.includes("Prints"))!;
   const bodyElement = tableElement.querySelector("tbody")!;
 
@@ -72,10 +71,15 @@ export function addScryfallStoreButtons(
   catalog: Catalog,
   document: Document
 ): void {
-  const toolboxElement = document.querySelector(".toolbox")!;
+  const toolboxElement = document.querySelector(".toolbox-column")!.children[1];
+  const storesElement = document.querySelector("#stores")?.children[1];
+
+  if (!storesElement) {
+    return;
+  }
 
   if (!options.multicolor) {
-    for (const linkElement of toolboxElement.querySelectorAll("a.button-n")) {
+    for (const linkElement of storesElement.querySelectorAll("a.button-n")) {
       linkElement.classList.remove("tcgplayer");
       linkElement.classList.remove("cardhoarder");
       for (const spanElement of linkElement.querySelectorAll("span")) {
@@ -86,7 +90,12 @@ export function addScryfallStoreButtons(
     }
   }
 
-  const storesElement = document.getElementById("stores")!.children[1];
+  if (!options.multicolor || !options.vendors.tcgPlayer) {
+    for (const linkElement of toolboxElement.querySelectorAll("a.button-n")) {
+      linkElement.classList.remove("tcgplayer");
+      linkElement.classList.remove("cardhoarder");
+    }
+  }
 
   for (const [vendor, enabled] of Object.entries(options.vendors) as Entries<
     typeof options.vendors
@@ -187,7 +196,7 @@ export function addScryfallStorePrices(
   catalog: Catalog,
   document: Document
 ): void {
-  const storesElement = document.getElementById("stores")!.children[1];
+  const storesElement = document.querySelector("#stores")!.children[1];
 
   for (const [vendor, enabled] of Object.entries(options.vendors) as Entries<
     typeof options.vendors
@@ -201,6 +210,7 @@ export function addScryfallStorePrices(
           `li#${camelToKebabCase(vendor)} a#${finish}`
         );
         if (linkElement && value?.price) {
+          (linkElement as HTMLAnchorElement).href = value!.url.href;
           const spanElement = document.createElement("span");
           spanElement.classList.add("price");
           if (!options.multicolor) {
@@ -226,12 +236,24 @@ export function addScryfallPrintButtons(
   options: Options,
   document: Document
 ): void {
-  const printsElement = document.querySelector(".prints")!;
   const tableElement = Array.from(
-    printsElement.querySelectorAll("table.prints-table")
+    document.querySelector(".prints")!.querySelectorAll("table.prints-table")
   ).find((table) => table.innerHTML.includes("Prints"))!;
   const headElement = tableElement.querySelector("thead")!.children[0];
   const bodyElement = tableElement.querySelector("tbody")!;
+
+  if (!options.multicolor) {
+    for (const linkElement of tableElement.querySelectorAll("a")) {
+      if (
+        linkElement.classList.contains("currency-usd") ||
+        linkElement.classList.contains("currency-tix")
+      ) {
+        linkElement.classList.add("currency-eur");
+        linkElement.classList.remove("currency-usd");
+        linkElement.classList.remove("currency-tix");
+      }
+    }
+  }
 
   const singleUsdColumn =
     (Object.entries(options.vendors) as Entries<typeof options.vendors>).filter(
@@ -277,16 +299,6 @@ export function addScryfallPrintButtons(
         } else if (vendor === "cardhoarder" && !singleTixColumn) {
           spanElement.textContent = "CHD";
         }
-        if (!options.multicolor) {
-          for (const rowElement of bodyElement.children) {
-            if (rowElement.textContent.includes("View all prints")) {
-              continue;
-            }
-            rowElement.children[index].classList.remove("currency-usd");
-            rowElement.children[index].classList.remove("currency-tix");
-            rowElement.children[index].classList.add("currency-eur");
-          }
-        }
       }
     } else if (enabled) {
       columnElement = document.createElement("th");
@@ -326,7 +338,7 @@ export function addScryfallPrintButtons(
         const linkElement = document.createElement("a");
         linkElement.id = camelToKebabCase(vendor);
         if (!options.multicolor) {
-          spanElement.classList.add("currency-eur");
+          linkElement.classList.add("currency-eur");
         } else if (vendor === "manaPool") {
           linkElement.className = "mana-pool";
         } else if (vendor === "cardKingdom") {
@@ -346,9 +358,8 @@ export function addScryfallPrintPrices(
   catalog: Catalog,
   document: Document
 ): void {
-  const printsElement = document.querySelector(".prints")!;
   const tableElement = Array.from(
-    printsElement.querySelectorAll("table.prints-table")
+    document.querySelector(".prints")!.querySelectorAll("table.prints-table")
   ).find((table) => table.innerHTML.includes("Prints"))!;
   const bodyElement = tableElement.querySelector("tbody")!;
 
@@ -381,23 +392,34 @@ export function addScryfallPrintPrices(
             catalog[
               (rowElement.children[0].children[0] as HTMLAnchorElement).href
             ]?.[vendor];
+          const titleArray = [];
           for (const [finish, value] of Object.entries(entry ?? []) as Entries<
             typeof entry
           >) {
             if (value?.price) {
-              linkElement.href = value.url.href;
-              if (
-                finish !== "nonfoil" &&
-                ((usdVendors.has(vendor) && singleUsdColumn) ||
-                  (eurVendors.has(vendor) && singleEurColumn) ||
-                  (tixVendors.has(vendor) && singleTixColumn))
-              ) {
-                linkElement.textContent = `✶\u00A0${value.price}`;
-              } else {
-                linkElement.textContent = value.price;
+              if (finish !== "etched") {
+                titleArray.push(
+                  `${finish.charAt(0).toUpperCase() + finish.slice(1)}: ${value.price}`
+                );
+              } else if (!entry?.nonfoil && !entry?.foil) {
+                titleArray.push(`Price: ${value.price}`);
+              }
+              if (!linkElement.textContent) {
+                linkElement.href = value.url.href;
+                if (
+                  finish !== "nonfoil" &&
+                  ((usdVendors.has(vendor) && singleUsdColumn) ||
+                    (eurVendors.has(vendor) && singleEurColumn) ||
+                    (tixVendors.has(vendor) && singleTixColumn))
+                ) {
+                  linkElement.textContent = `✶\u00A0${value.price}`;
+                } else {
+                  linkElement.textContent = value.price;
+                }
               }
             }
           }
+          linkElement.title = titleArray.join(", ");
         }
       }
     }

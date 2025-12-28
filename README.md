@@ -8,9 +8,7 @@
 
 # ScryBuy
 
-A Firefox/Chrome extension that adds [Card Kingdom](https://www.cardkingdom.com) purchase buttons to [Scryfall](https://scryfall.com) card pages.
-
-## Features
+A Firefox/Chrome extension that adds store purchase links and pricing information to [Scryfall](https://scryfall.com) card pages.
 
 <table align="center" border="0" cellspacing="0" cellpadding="0" style="border: none;">
   <tr>
@@ -25,11 +23,14 @@ A Firefox/Chrome extension that adds [Card Kingdom](https://www.cardkingdom.com)
   </tr>
 </table>
 
-- Shows Card Kingdom prices for both regular and foil versions.
-- Shows prices inline in the prints section.
+## Features
 
-## Limitations
-
-- Finds a direct link around 90% of the time.
-- If the direct link cannot be found, links to a search on Card Kingdom.
-- The incomplete list of conversions from set codes to Card Kingdom URL slugs is the main source of missing links.
+- Adds purchase links for:
+  - [Mana Pool](https://manapool.com)
+  - [Card Kingdom](https://www.cardkingdom.com)
+- Allows hiding individual marketplaces, including:
+  - TCGplayer
+  - Cardmarket
+  - Cardhoarder
+- Shows prices for both regular and foil versions.
+- Shows prices on store buttons and in the prints section.
