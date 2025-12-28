@@ -15,10 +15,10 @@ browser.runtime.onMessage.addListener((message: any) => {
   }
 });
 
-export async function fetchDom(url: string): Promise<Document | null> {
+export async function fetchDom(url: URL): Promise<Document | null> {
   const text: string | null = await browser.runtime.sendMessage({
     action: "fetchUrl",
-    url: url,
+    url: url.href,
   });
   if (text) {
     const domParser = new DOMParser();

@@ -1,0 +1,26 @@
+$vendors: (
+  "mana-pool": #0095ff,
+  "card-kingdom": #004285,
+);
+
+@each $name, $color in $vendors {
+  .#{$name} {
+    &.button-n {
+      color: #{$color};
+      border-color: #{$color};
+    }
+    &,
+    a {
+      color: #{$color} !important;
+    }
+    svg path {
+      fill: #{$color} !important;
+    }
+  }
+}
+
+html.loading,
+html.loading body {
+  visibility: hidden !important;
+  background: transparent !important;
+}

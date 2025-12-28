@@ -25,5 +25,10 @@
       "css": ["index.css"],
       "run_at": "document_start"
     }
-  ]
+  ],
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+  "options_page": "options.html"
 }

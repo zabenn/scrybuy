@@ -8,41 +8,55 @@ type EnumMap<
   ? { -readonly [K in keyof E as K extends string ? K : never]?: T }
   : { -readonly [K in keyof E as K extends string ? K : never]: T };
 
-export const enum Stores {
+export type Options = {
+  vendors: EnumMap<typeof Vendors, boolean, false>;
+  hideWhileLoading: boolean;
+  multicolor: boolean;
+};
+
+export const enum Vendors {
   tcgPlayer,
   manaPool,
   cardKingdom,
-  cardMarket,
-  cardHoarder,
+  cardmarket,
+  cardhoarder,
 }
 
 export type Catalog = Record<
   string,
   EnumMap<
-    typeof Stores,
+    typeof Vendors,
     EnumMap<
       typeof CardFinish,
       {
-        url: string;
+        url: URL;
         price?: string;
       }
     >
   >
 >;
 
-export type Options = {
-  stores: EnumMap<typeof Stores, boolean, false>;
+export const defaultOptions: Options = {
+  vendors: {
+    tcgPlayer: true,
+    manaPool: true,
+    cardKingdom: true,
+    cardmarket: true,
+    cardhoarder: true,
+  },
+  hideWhileLoading: true,
+  multicolor: false,
 };
 
-export const ExistingStores = new Set<keyof typeof Stores>([
+export const existingVendors = new Set<keyof typeof Vendors>([
   "tcgPlayer",
-  "cardMarket",
-  "cardHoarder",
-] as const);
-export const UsdStores = new Set<keyof typeof Stores>([
+  "cardmarket",
+  "cardhoarder",
+]);
+export const usdVendors = new Set<keyof typeof Vendors>([
   "tcgPlayer",
   "manaPool",
   "cardKingdom",
-] as const);
-export const EurStores = new Set<keyof typeof Stores>(["cardMarket"] as const);
-export const TixStores = new Set<keyof typeof Stores>(["cardHoarder"] as const);
+]);
+export const eurVendors = new Set<keyof typeof Vendors>(["cardmarket"]);
+export const tixVendors = new Set<keyof typeof Vendors>(["cardhoarder"]);

@@ -11,7 +11,6 @@ const setToSlugs: Record<string, string[]> = {
   "30a": ["magic-30th-anniversary-edition"],
   "3ed": ["3rd-edition"],
   "40k": ["universes-beyond-warhammer-40000"],
-  "4bb": ["4th-edition"],
   "4ed": ["4th-edition"],
   "5dn": ["fifth-dawn"],
   "5ed": ["5th-edition"],
@@ -358,6 +357,8 @@ const setToSlugs: Record<string, string[]> = {
   znr: ["zendikar-rising"],
 };
 
+const base = "https://www.cardkingdom.com";
+
 function getName(card: Card): string {
   let name = card!.name;
   if (card!.card_faces && card!.layout !== "split") {
@@ -397,59 +398,82 @@ function getCollectorNumbers(card: Card): string[] {
   ];
 }
 
-function getCardUrls(urlToCards: Record<string, Card>): Set<string> {
+function getCardUrls(urlToCards: Record<string, Card>): Set<URL> {
   const name = getName(Object.values(urlToCards)[0]);
-  const urls = new Set<string>();
-  if (["Forest", "Island", "Mountain", "Plains", "Swamp"].includes(name)) {
-    const slugs = new Set<string>();
-    for (const card of Object.values(urlToCards)) {
-      for (const slug of getSlugs(card)) {
-        slugs.add(slug);
+  const urls = new Set<URL>();
+  for (const tab of ["mtg_card", "mtg_foil"]) {
+    if (["Forest", "Island", "Mountain", "Plains", "Swamp"].includes(name)) {
+      const slugs = new Set<string>();
+      for (const card of Object.values(urlToCards)) {
+        for (const slug of getSlugs(card)) {
+          slugs.add(slug);
+        }
       }
-    }
-    for (const slug of slugs) {
-      for (const tab of ["mtg_card", "mtg_foil"]) {
+      for (const slug of slugs) {
         urls.add(
-          `https://www.cardkingdom.com/catalog/search?=mtg_advanced&filter[edition]=${slug}&filter[tab]=${tab}&filter[search]=mtg_advanced&filter[name]=${name}`
+          new URL(
+            `catalog/search?=mtg_advanced&filter[edition]=${slug}&filter[tab]=${tab}&filter[search]=mtg_advanced&filter[name]=${name}`,
+            base
+          )
         );
       }
-    }
-  } else if (["Command Tower", "Sol Ring"].includes(name)) {
-    for (let i = 1; i <= 2; i++) {
-      for (const tab of ["mtg_card", "mtg_foil"]) {
+    } else if (["Command Tower", "Sol Ring"].includes(name)) {
+      for (let i = 1; i <= 2; i++) {
         urls.add(
-          `https://www.cardkingdom.com/catalog/search?filter[tab]=${tab}&filter[search]=mtg_advanced&filter[name]=${name}&page=${i}`
+          new URL(
+            `catalog/search?filter[tab]=${tab}&filter[search]=mtg_advanced&filter[name]=${name}&page=${i}`,
+            base
+          )
         );
       }
-    }
-  } else {
-    for (const tab of ["mtg_card", "mtg_foil"]) {
+    } else {
       urls.add(
-        `https://www.cardkingdom.com/catalog/search?filter[tab]=${tab}&filter[search]=mtg_advanced&filter[name]=${name}`
+        new URL(
+          `catalog/search?filter[tab]=${tab}&filter[search]=mtg_advanced&filter[name]=${name}`,
+          base
+        )
       );
     }
   }
   return urls;
 }
 
-export async function addCardKingdomEntries(
+export function addCardKingdomEntries(
   catalog: Catalog,
   urlToCards: Record<string, Card>
-): Promise<void> {
+): void {
   for (const [scryfallUrl, card] of Object.entries(urlToCards) as Entries<
     typeof urlToCards
   >) {
     catalog[scryfallUrl] ??= {};
-    catalog[scryfallUrl].cardKingdom = {
-      nonfoil: {
-        url: `https://www.cardkingdom.com/catalog/search?filter[search]=mtg_advanced&filter[name]=${getName(card)}`,
-      },
-    };
+    catalog[scryfallUrl].cardKingdom = {};
+    for (const finish of card.finishes) {
+      let cardUrl = null;
+      if (finish === "nonfoil") {
+        cardUrl = new URL(
+          `catalog/search?filter[tab]=mtg_card&filter[search]=mtg_advanced&filter[name]=${getName(card)}`,
+          base
+        );
+      } else if (finish === "foil" || finish === "etched") {
+        cardUrl = new URL(
+          `catalog/search?filter[tab]=mtg_foil&filter[search]=mtg_advanced&filter[name]=${getName(card)}`,
+          base
+        );
+      }
+      if (cardUrl) {
+        catalog[scryfallUrl].cardKingdom[finish] = { url: cardUrl };
+      }
+    }
   }
+}
 
+export async function fetchCardKingdomEntries(
+  catalog: Catalog,
+  urlToCards: Record<string, Card>
+): Promise<void> {
   const fetches: Promise<Document | null | void>[] = [];
   for (const cardUrl of getCardUrls(urlToCards)) {
-    console.log("Fetching Card Kingdom URL: ", cardUrl);
+    console.log("Fetching Card Kingdom URL: ", cardUrl.href);
     fetches.push(
       fetchDom(cardUrl).then((document) => {
         if (!document) {
@@ -462,13 +486,17 @@ export async function addCardKingdomEntries(
               productCardWrapperElement
                 .querySelector(".addToCartByType")
                 ?.querySelector(".active")
-                ?.querySelector(".stylePrice")?.textContent ?? null;
-            const printUrl = (
-              productCardWrapperElement.querySelector(".productDetailTitle")
-                ?.children[0] as HTMLAnchorElement
-            ).href;
+                ?.querySelector(".stylePrice")
+                ?.textContent.trim() ?? null;
+            const printUrl = new URL(
+              (
+                productCardWrapperElement.querySelector(".productDetailTitle")
+                  ?.children[0] as HTMLAnchorElement
+              ).getAttribute("href")!,
+              base
+            );
 
-            const slug = printUrl.split("/")[4];
+            const slug = printUrl.pathname.split("/")[2];
             const collectorNumber = productCardWrapperElement
               .querySelector(".collector-number")
               ?.innerHTML.trim()
@@ -489,9 +517,9 @@ export async function addCardKingdomEntries(
                   url: printUrl,
                   price: price ?? undefined,
                 };
-                if (printUrl.includes("etched-foil")) {
+                if (printUrl.pathname.includes("etched-foil")) {
                   catalog[scryfallUrl].cardKingdom!.etched = entry;
-                } else if (printUrl.includes("foil")) {
+                } else if (printUrl.pathname.includes("foil")) {
                   catalog[scryfallUrl].cardKingdom!.foil = entry;
                 } else {
                   catalog[scryfallUrl].cardKingdom!.nonfoil = entry;

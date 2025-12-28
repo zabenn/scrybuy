@@ -17,6 +17,7 @@
     "128": "icons/icon-blue.svg"
   },
   "permissions": [
+    "storage",
     "https://api.scryfall.com/*",
     "https://manapool.com/*",
     "https://www.cardkingdom.com/*"
@@ -32,5 +33,17 @@
       "css": ["index.css"],
       "run_at": "document_start"
     }
-  ]
+  ],
+  "browser_action": {
+    "default_icon": "icons/icon-blue.svg",
+    "theme_icons": [
+      {
+        "light": "icons/icon-white.svg",
+        "dark": "icons/icon-black.svg",
+        "size": 32
+      }
+    ],
+    "default_title": "ScryBuy",
+    "default_popup": "popup.html"
+  }
 }
