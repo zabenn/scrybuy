@@ -24,7 +24,7 @@ function camelToKebabCase(str: string): string {
 export async function getScryfallCards(
   document: Document
 ): Promise<Record<string, Card>> {
-  setAgent("ScryBuy", "1.1.0");
+  setAgent("ScryBuy", "2.0.1");
 
   const tableElement = Array.from(
     document.querySelector(".prints")!.querySelectorAll("table.prints-table")
@@ -380,7 +380,7 @@ export function addScryfallPrintPrices(
     for (const [vendor, enabled] of Object.entries(options.vendors) as Entries<
       typeof options.vendors
     >) {
-      if (rowElement.textContent.includes("View all prints")) {
+      if (rowElement.innerHTML?.includes("View all prints")) {
         continue;
       }
       if (!existingVendors.has(vendor) && enabled) {

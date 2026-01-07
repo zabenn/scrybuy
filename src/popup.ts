@@ -1,5 +1,5 @@
 import browser from "webextension-polyfill";
-import { Options, defaultOptions } from "./types";
+import { Options, getOptions } from "./types";
 
 const tcgPlayerElement = document.getElementById(
   "tcg-player"
@@ -54,7 +54,7 @@ async function main() {
     window.matchMedia("(prefers-color-scheme: dark)").matches
   );
 
-  const options = (await browser.storage.sync.get(defaultOptions)) as Options;
+  const options = await getOptions();
 
   setupToggleButton(tcgPlayerElement, options.vendors.tcgPlayer);
   setupToggleButton(manaPoolElement, options.vendors.manaPool);

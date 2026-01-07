@@ -6,14 +6,13 @@ import {
   getScryfallCards,
 } from "./scryfall";
 import { addCardKingdomEntries, fetchCardKingdomEntries } from "./cardKingdom";
-import { Catalog, defaultOptions, Options } from "./types";
+import { Catalog, getOptions } from "./types";
 import { addManaPoolEntries, fetchManaPoolEntries } from "./manaPool";
-import browser from "webextension-polyfill";
 
 document.documentElement.classList.add("loading");
 
 async function main() {
-  const options = (await browser.storage.sync.get(defaultOptions)) as Options;
+  const options = await getOptions();
 
   const catalog: Catalog = {};
 

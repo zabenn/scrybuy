@@ -1,3 +1,4 @@
+import browser from "webextension-polyfill";
 import { CardFinish } from "scryfall-sdk";
 
 type EnumMap<
@@ -60,3 +61,16 @@ export const usdVendors = new Set<keyof typeof Vendors>([
 ]);
 export const eurVendors = new Set<keyof typeof Vendors>(["cardmarket"]);
 export const tixVendors = new Set<keyof typeof Vendors>(["cardhoarder"]);
+
+export async function getOptions(): Promise<Options> {
+  const stored = (await browser.storage.sync.get(null)) as Partial<Options>;
+  return {
+    vendors: {
+      ...defaultOptions.vendors,
+      ...(stored.vendors ?? {}),
+    },
+    hideWhileLoading:
+      stored.hideWhileLoading ?? defaultOptions.hideWhileLoading,
+    multicolor: stored.multicolor ?? defaultOptions.multicolor,
+  };
+}
