@@ -1,76 +1,42 @@
 import browser from "webextension-polyfill";
-import { CardFinish } from "scryfall-sdk";
+import type { components } from "./scrybuy-api-openapi";
 
-type EnumMap<
-  E extends Record<string, any>,
-  T = any,
-  Optional extends boolean = true,
-> = Optional extends true
-  ? { -readonly [K in keyof E as K extends string ? K : never]?: T }
-  : { -readonly [K in keyof E as K extends string ? K : never]: T };
+export type Price = components["schemas"]["Price"];
+export type VendorEntry = components["schemas"]["VendorEntry"];
+export type FinishEntry = components["schemas"]["FinishEntry"];
 
-export type Options = {
-  vendors: EnumMap<typeof Vendors, boolean, false>;
-  hideWhileLoading: boolean;
-  multicolor: boolean;
-};
+export type Vendor = keyof Price | "tcgPlayer" | "cardmarket" | "cardhoarder";
 
-export const enum Vendors {
-  tcgPlayer,
-  manaPool,
-  cardKingdom,
-  cardmarket,
-  cardhoarder,
-}
-
-export type Catalog = Record<
-  string,
-  EnumMap<
-    typeof Vendors,
-    EnumMap<
-      typeof CardFinish,
-      {
-        url: URL;
-        price?: string;
-      }
-    >
-  >
->;
-
-export const defaultOptions: Options = {
-  vendors: {
-    tcgPlayer: true,
-    manaPool: true,
-    cardKingdom: true,
-    cardmarket: true,
-    cardhoarder: true,
-  },
-  hideWhileLoading: true,
-  multicolor: false,
-};
-
-export const existingVendors = new Set<keyof typeof Vendors>([
+export const addedVendors = new Set<Vendor>(["manaPool", "cardKingdom"]);
+export const existingVendors = new Set<Vendor>([
   "tcgPlayer",
   "cardmarket",
   "cardhoarder",
 ]);
-export const usdVendors = new Set<keyof typeof Vendors>([
+export const usdVendors = new Set<Vendor>([
   "tcgPlayer",
   "manaPool",
   "cardKingdom",
 ]);
-export const eurVendors = new Set<keyof typeof Vendors>(["cardmarket"]);
-export const tixVendors = new Set<keyof typeof Vendors>(["cardhoarder"]);
+export const eurVendors = new Set<Vendor>(["cardmarket"]);
+export const tixVendors = new Set<Vendor>(["cardhoarder"]);
+
+export type Options = {
+  vendors: Record<Vendor, boolean>;
+  multicolor: boolean;
+};
 
 export async function getOptions(): Promise<Options> {
-  const stored = (await browser.storage.sync.get(null)) as Partial<Options>;
+  const storedOptions = (await browser.storage.sync.get()) as Partial<Options>;
   return {
     vendors: {
-      ...defaultOptions.vendors,
-      ...(stored.vendors ?? {}),
+      tcgPlayer: true,
+      manaPool: true,
+      cardKingdom: true,
+      cardmarket: true,
+      cardhoarder: true,
+      ...(storedOptions.vendors ?? {}),
     },
-    hideWhileLoading:
-      stored.hideWhileLoading ?? defaultOptions.hideWhileLoading,
-    multicolor: stored.multicolor ?? defaultOptions.multicolor,
+    multicolor: storedOptions.multicolor ?? false,
   };
 }

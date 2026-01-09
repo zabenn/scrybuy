@@ -10,16 +10,15 @@ const manaPoolElement = document.getElementById(
 const cardKingdomElement = document.getElementById(
   "card-kingdom"
 ) as HTMLInputElement;
+
 const cardmarketElement = document.getElementById(
   "cardmarket"
 ) as HTMLInputElement;
+
 const cardhoarderElement = document.getElementById(
   "cardhoarder"
 ) as HTMLInputElement;
 
-const hideWhileLoadingElement = document.getElementById(
-  "hide-while-loading"
-) as HTMLInputElement;
 const multicolorElement = document.getElementById(
   "multicolor"
 ) as HTMLInputElement;
@@ -33,7 +32,6 @@ async function onToggleChanged(element: HTMLInputElement) {
       cardmarket: cardmarketElement.checked,
       cardhoarder: cardhoarderElement.checked,
     },
-    hideWhileLoading: hideWhileLoadingElement.checked,
     multicolor: multicolorElement.checked,
   };
 
@@ -61,7 +59,6 @@ async function main() {
   setupToggleButton(cardKingdomElement, options.vendors.cardKingdom);
   setupToggleButton(cardmarketElement, options.vendors.cardmarket);
   setupToggleButton(cardhoarderElement, options.vendors.cardhoarder);
-  setupToggleButton(hideWhileLoadingElement, options.hideWhileLoading);
   setupToggleButton(multicolorElement, options.multicolor);
 }
 

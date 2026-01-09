@@ -1,28 +1,32 @@
 import browser from "webextension-polyfill";
+import type { paths, components } from "./scrybuy-api-openapi";
+import createClient from "openapi-fetch";
+import { Price } from "./types";
+
+const client = createClient<paths>({
+  baseUrl: "https://scrybuy-api.fly.dev/",
+  headers: { "User-Agent": "ScryBuy/2.1.0" },
+});
 
 browser.runtime.onMessage.addListener((message: any) => {
-  if (message.action === "fetchUrl") {
-    return fetch(message.url, {
-      headers: {
-        "User-Agent": "ScryBuy/2.0.1",
-      },
-    }).then((response) => {
-      if (response.ok) {
-        return response.text();
-      }
-      return null;
-    });
+  if (message.action === "fetchPrices") {
+    return client
+      .GET("/prices", {
+        params: {
+          query: { id: message.ids },
+        },
+      })
+      .then(({ data }) => data);
   }
 });
 
-export async function fetchDom(url: URL): Promise<Document | null> {
-  const text: string | null = await browser.runtime.sendMessage({
-    action: "fetchUrl",
-    url: url.href,
+export async function fetchPrices(ids: string[]): Promise<Price[] | null> {
+  const data: Price[] | undefined = await browser.runtime.sendMessage({
+    action: "fetchPrices",
+    ids: ids,
   });
-  if (text) {
-    const domParser = new DOMParser();
-    return domParser.parseFromString(text, "text/html");
+  if (data) {
+    return data;
   }
   return null;
 }

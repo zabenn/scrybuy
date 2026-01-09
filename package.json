@@ -1,6 +1,6 @@
 {
   "name": "scrybuy",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "license": "GPL-3.0-only",
   "scripts": {
     "build": "pnpm build:chrome && pnpm build:firefox",
@@ -24,6 +24,8 @@
   "dependencies": {
     "bestzip": "^2.2.1",
     "esbuild": "^0.27.1",
+    "openapi-fetch": "^0.15.0",
+    "openapi-typescript": "^7.10.1",
     "sass": "^1.97.1",
     "scryfall-sdk": "^5.0.3",
     "type-fest": "^5.3.1"

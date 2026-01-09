@@ -32,5 +32,5 @@ A Firefox/Chrome extension that adds store purchase links and pricing informatio
   - TCGplayer
   - Cardmarket
   - Cardhoarder
-- Shows prices for both regular and foil versions.
-- Shows prices on store buttons and in the prints section.
+- Shows price for both regular and foil versions.
+- Shows price on store buttons and in the prints section.
