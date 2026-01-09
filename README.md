@@ -34,3 +34,7 @@ A Firefox/Chrome extension that adds store purchase links and pricing informatio
   - Cardhoarder
 - Shows price for both regular and foil versions.
 - Shows price on store buttons and in the prints section.
+
+## Disclosure
+
+This extension uses affiliate links for Mana Pool and Card Kingdom. Purchases made through these links may help support the development of ScryBuy at no additional cost to you.
