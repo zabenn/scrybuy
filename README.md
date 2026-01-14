@@ -12,14 +12,14 @@ A Firefox/Chrome extension that adds store purchase links and pricing informatio
 
 <table align="center" border="0" cellspacing="0" cellpadding="0" style="border: none;">
   <tr>
-    <td style="border: none;"><img src="docs/stores_before.png" alt="Stores before" width="300" /></td>
-    <td align="center" style="border: none;">➡</td>
-    <td style="border: none;"><img src="docs/stores_after.png" alt="Stores after" width="300" /></td>
+    <td><img src="docs/stores_before.png" alt="Stores before" width="300" /></td>
+    <td align="center">➡</td>
+    <td><img src="docs/stores_after.png" alt="Stores after" width="300" /></td>
   </tr>
   <tr>
-    <td style="border: none;"><img src="docs/prints_before.png" alt="Prints before" width="300" /></td>
-    <td align="center" style="border: none;">➡</td>
-    <td style="border: none;"><img src="docs/prints_after.png" alt="Prints after" width="300" /></td>
+    <td><img src="docs/prints_before.png" alt="Prints before" width="300" /></td>
+    <td align="center">➡</td>
+    <td><img src="docs/prints_after.png" alt="Prints after" width="300" /></td>
   </tr>
 </table>
 
