@@ -1,13 +1,13 @@
 {
   "name": "scrybuy",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "license": "GPL-3.0-only",
   "scripts": {
     "build": "pnpm build:chrome && pnpm build:firefox",
     "build:chrome": "OUTDIR=dist/chrome INDIR=src/chrome bash -c 'pnpm run esbuild && pnpm run sass && pnpm run copyfiles'",
     "build:firefox": "OUTDIR=dist/firefox INDIR=src/firefox bash -c 'pnpm run esbuild && pnpm run sass && pnpm run copyfiles'",
     "copyfiles": "copyfiles -u 1 src/popup.html src/icons/*.{png,svg} $OUTDIR && copyfiles -u 2 $INDIR/manifest.json $OUTDIR",
-    "esbuild": "esbuild src/background.ts src/contentScript.ts src/popup.ts --bundle --outdir=$OUTDIR --format=iife",
+    "esbuild": "esbuild src/background.ts src/contentScript.ts src/popup.ts --bundle --outdir=$OUTDIR --format=iife --loader:.svg=text",
     "sass": "sass src:$OUTDIR $INDIR:$OUTDIR --no-source-map",
     "zip": "pnpm zip:chrome && pnpm zip:firefox",
     "zip:chrome": "pnpm build:chrome && cd dist/chrome && bestzip ../scrybuy-chrome.zip *",
@@ -15,19 +15,18 @@
   },
   "devDependencies": {
     "@types/node-fetch": "^2.6.13",
-    "@types/webextension-polyfill": "^0.12.4",
+    "@types/webextension-polyfill": "^0.12.5",
+    "bestzip": "^2.2.6",
     "copyfiles": "^2.4.1",
-    "prettier": "^3.7.4",
-    "typescript": "^5.9.3",
-    "webextension-polyfill": "^0.12.0"
+    "esbuild": "^0.27.7",
+    "openapi-typescript": "^7.13.0",
+    "prettier": "^3.9.6",
+    "sass": "^1.102.0",
+    "typescript": "^5.9.3"
   },
   "dependencies": {
-    "bestzip": "^2.2.1",
-    "esbuild": "^0.27.1",
-    "openapi-fetch": "^0.15.0",
-    "openapi-typescript": "^7.10.1",
-    "sass": "^1.97.1",
-    "scryfall-sdk": "^5.0.3",
-    "type-fest": "^5.3.1"
+    "openapi-fetch": "^0.15.2",
+    "type-fest": "^5.8.0",
+    "webextension-polyfill": "^0.12.0"
   }
 }

@@ -1,32 +1,58 @@
 import browser from "webextension-polyfill";
-import type { paths, components } from "./scrybuy-api-openapi";
+import type { paths } from "./scrybuy-api-openapi";
 import createClient from "openapi-fetch";
-import { Price } from "./types";
+import { PriceEntry } from "./types";
 
 const client = createClient<paths>({
-  baseUrl: "https://scrybuy-api.fly.dev/",
-  headers: { "User-Agent": "ScryBuy/2.1.0" },
+  baseUrl: "https://scrybuy-api.onrender.com/",
+  headers: { "User-Agent": "ScryBuy/2.2.0" },
 });
+
+const MAX_FETCH_ATTEMPTS = 3;
+
+async function fetchPricesWithRetry(
+  urls: string[],
+): Promise<{ [key: string]: PriceEntry } | undefined> {
+  let lastError: unknown;
+  for (let attempt = 1; attempt <= MAX_FETCH_ATTEMPTS; attempt++) {
+    try {
+      const { data, error, response } = await client.GET("/prices", {
+        params: {
+          query: { url: urls },
+        },
+      });
+      if (!error && response.ok) {
+        return data;
+      }
+      lastError = error ?? response.statusText;
+    } catch (err) {
+      lastError = err;
+    }
+    console.warn(
+      `fetchPrices attempt ${attempt}/${MAX_FETCH_ATTEMPTS} failed`,
+      lastError,
+    );
+  }
+  console.error("fetchPrices failed after retries", lastError);
+  return undefined;
+}
 
 browser.runtime.onMessage.addListener((message: any) => {
   if (message.action === "fetchPrices") {
-    return client
-      .GET("/prices", {
-        params: {
-          query: { id: message.ids },
-        },
-      })
-      .then(({ data }) => data);
+    return fetchPricesWithRetry(message.urls);
   }
 });
 
-export async function fetchPrices(ids: string[]): Promise<Price[] | null> {
-  const data: Price[] | undefined = await browser.runtime.sendMessage({
-    action: "fetchPrices",
-    ids: ids,
-  });
+export async function fetchPrices(
+  urls: string[],
+): Promise<{ [key: string]: PriceEntry }> {
+  const data: { [key: string]: PriceEntry } | undefined =
+    await browser.runtime.sendMessage({
+      action: "fetchPrices",
+      urls: urls,
+    });
   if (data) {
     return data;
   }
-  return null;
+  return {};
 }

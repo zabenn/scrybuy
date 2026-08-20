@@ -11,7 +11,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get price information for the given Scryfall IDs. */
+        /** Get price information for the given Scryfall URLs. */
         get: operations["get_prices_prices_get"];
         put?: never;
         post?: never;
@@ -37,10 +37,11 @@ export interface components {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
         };
-        /** Price */
-        Price: {
+        /** PriceEntry */
+        PriceEntry: {
             manaPool?: components["schemas"]["VendorEntry"] | null;
             cardKingdom?: components["schemas"]["VendorEntry"] | null;
+            cardsphere?: components["schemas"]["VendorEntry"] | null;
         };
         /** ValidationError */
         ValidationError: {
@@ -50,6 +51,10 @@ export interface components {
             msg: string;
             /** Error Type */
             type: string;
+            /** Input */
+            input?: unknown;
+            /** Context */
+            ctx?: Record<string, never>;
         };
         /** VendorEntry */
         VendorEntry: {
@@ -69,8 +74,8 @@ export interface operations {
     get_prices_prices_get: {
         parameters: {
             query?: {
-                /** @description List of Scryfall card IDs to retrieve price information for. */
-                id?: string[];
+                /** @description List of Scryfall card URLs to retrieve price information for. */
+                url?: string[];
             };
             header?: never;
             path?: never;
@@ -84,7 +89,9 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Price"][];
+                    "application/json": {
+                        [key: string]: components["schemas"]["PriceEntry"];
+                    };
                 };
             };
             /** @description Validation Error */

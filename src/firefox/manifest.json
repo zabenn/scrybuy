@@ -16,18 +16,18 @@
     "96": "icons/icon.svg",
     "128": "icons/icon.svg"
   },
-  "permissions": [
-    "storage",
-    "https://api.scryfall.com/*",
-    "https://scrybuy-api.fly.dev/*"
-  ],
+  "permissions": ["storage", "https://scrybuy-api.onrender.com/*"],
   "background": {
     "scripts": ["background.js"],
     "persistent": true
   },
   "content_scripts": [
     {
-      "matches": ["https://scryfall.com/card/*"],
+      "matches": [
+        "https://scryfall.com/card/*",
+        "https://scryfall.com/search*",
+        "https://scryfall.com/sets/*"
+      ],
       "js": ["contentScript.js"],
       "css": ["index.css"],
       "run_at": "document_start"

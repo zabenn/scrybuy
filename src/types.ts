@@ -1,11 +1,15 @@
 import browser from "webextension-polyfill";
 import type { components } from "./scrybuy-api-openapi";
 
-export type Price = components["schemas"]["Price"];
+export type PriceEntry = components["schemas"]["PriceEntry"];
 export type VendorEntry = components["schemas"]["VendorEntry"];
 export type FinishEntry = components["schemas"]["FinishEntry"];
 
-export type Vendor = keyof Price | "tcgPlayer" | "cardmarket" | "cardhoarder";
+export type Vendor =
+  | keyof PriceEntry
+  | "tcgPlayer"
+  | "cardmarket"
+  | "cardhoarder";
 
 export const addedVendors = new Set<Vendor>(["manaPool", "cardKingdom"]);
 export const existingVendors = new Set<Vendor>([
@@ -17,6 +21,7 @@ export const usdVendors = new Set<Vendor>([
   "tcgPlayer",
   "manaPool",
   "cardKingdom",
+  "cardsphere",
 ]);
 export const eurVendors = new Set<Vendor>(["cardmarket"]);
 export const tixVendors = new Set<Vendor>(["cardhoarder"]);
@@ -33,6 +38,7 @@ export async function getOptions(): Promise<Options> {
       tcgPlayer: true,
       manaPool: true,
       cardKingdom: true,
+      cardsphere: false,
       cardmarket: true,
       cardhoarder: true,
       ...(storedOptions.vendors ?? {}),
