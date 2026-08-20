@@ -16,11 +16,18 @@ body {
     margin: 4px 0;
     border: none;
   }
+  a {
+    align-self: center;
+    text-decoration: none;
+  }
   &.dark {
     background: #36363a;
     color: white;
     hr {
       background-color: #69696c;
+    }
+    a {
+      color: white;
     }
   }
 }
