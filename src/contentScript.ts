@@ -38,7 +38,10 @@ const addedVendorConfig: Partial<Record<Vendor, AddedVendorConfig>> = {
       affiliateUrl.searchParams.append("ref", "scrybuy");
       return affiliateUrl.toString();
     },
-    buildSearchUrl: (query) => `https://manapool.com/cards?q=${query}`,
+    buildSearchUrl: (query) =>
+      addedVendorConfig.manaPool!.buildAffiliateUrl(
+        `https://manapool.com/cards?q=${query}`,
+      ),
   },
   cardKingdom: {
     displayName: "Card Kingdom",
@@ -54,7 +57,9 @@ const addedVendorConfig: Partial<Record<Vendor, AddedVendorConfig>> = {
       return affiliateUrl.toString();
     },
     buildSearchUrl: (query) =>
-      `https://www.cardkingdom.com/catalog/search?search=header&filter[name]=${query}`,
+      addedVendorConfig.cardKingdom!.buildAffiliateUrl(
+        `https://www.cardkingdom.com/catalog/search?search=header&filter[name]=${query}`,
+      ),
   },
 };
 
