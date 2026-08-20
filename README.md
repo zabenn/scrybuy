@@ -34,6 +34,7 @@ A Firefox/Chrome extension that adds store purchase links and pricing informatio
   - Cardhoarder
 - Shows price for both regular and foil versions.
 - Shows price on store buttons and in the prints section.
+- Shows price directly in Scryfall's checklist view.
 
 ## Disclosure
 
