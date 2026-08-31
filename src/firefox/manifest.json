@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "ScryBuy",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "description": "Adds and hides purchase links on Scryfall",
   "browser_specific_settings": {
     "gecko": {

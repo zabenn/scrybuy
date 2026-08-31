@@ -6,10 +6,7 @@ export type VendorEntry = components["schemas"]["VendorEntry"];
 export type FinishEntry = components["schemas"]["FinishEntry"];
 
 export type Vendor =
-  | keyof PriceEntry
-  | "tcgPlayer"
-  | "cardmarket"
-  | "cardhoarder";
+  keyof PriceEntry | "tcgPlayer" | "cardmarket" | "cardhoarder";
 
 export const addedVendors = new Set<Vendor>(["manaPool", "cardKingdom"]);
 export const existingVendors = new Set<Vendor>([
@@ -38,11 +35,11 @@ export async function getOptions(): Promise<Options> {
       tcgPlayer: true,
       manaPool: true,
       cardKingdom: true,
-      cardsphere: false,
+      cardsphere: true,
       cardmarket: true,
       cardhoarder: true,
       ...(storedOptions.vendors ?? {}),
     },
-    multicolor: storedOptions.multicolor ?? false,
+    multicolor: storedOptions.multicolor ?? true,
   };
 }

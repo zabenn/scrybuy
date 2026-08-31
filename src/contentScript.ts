@@ -1,6 +1,7 @@
 import { Entries } from "type-fest";
 import { fetchPrices } from "./background";
 import cardKingdomSvg from "./card-kingdom.svg";
+import cardsphereSvg from "./cardsphere.svg";
 import manaPoolSvg from "./mana-pool.svg";
 import {
   eurVendors,
@@ -59,6 +60,17 @@ const addedVendorConfig: Partial<Record<Vendor, AddedVendorConfig>> = {
     buildSearchUrl: (query) =>
       addedVendorConfig.cardKingdom!.buildAffiliateUrl(
         `https://www.cardkingdom.com/catalog/search?search=header&filter[name]=${query}`,
+      ),
+  },
+  cardsphere: {
+    displayName: "Cardsphere",
+    abbrev: "CSP",
+    className: "cardsphere",
+    svg: cardsphereSvg,
+    buildAffiliateUrl: (url) => url,
+    buildSearchUrl: (query) =>
+      addedVendorConfig.cardsphere!.buildAffiliateUrl(
+        `https://www.cardsphere.com/search?q=${query}`,
       ),
   },
 };

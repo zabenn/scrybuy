@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14" focusable="false" aria-hidden="true">
-  <g>
+  <g transform="translate(0,1.005)">
     <path d="M0 0 V4.38 H1.97 V11.99 H12.03 V4.38 H14 V0 H11.82 V4.12 H9.96 V0.03 H7.89 V4.12 H6.11 V0 H4.04 V4.12 H2.18 V0 Z"/>
   </g>
 </svg>

@@ -2,25 +2,28 @@ import browser from "webextension-polyfill";
 import { Options, getOptions } from "./types";
 
 const tcgPlayerElement = document.getElementById(
-  "tcg-player"
+  "tcg-player",
 ) as HTMLInputElement;
 const manaPoolElement = document.getElementById(
-  "mana-pool"
+  "mana-pool",
 ) as HTMLInputElement;
 const cardKingdomElement = document.getElementById(
-  "card-kingdom"
+  "card-kingdom",
+) as HTMLInputElement;
+const cardsphereElement = document.getElementById(
+  "cardsphere",
 ) as HTMLInputElement;
 
 const cardmarketElement = document.getElementById(
-  "cardmarket"
+  "cardmarket",
 ) as HTMLInputElement;
 
 const cardhoarderElement = document.getElementById(
-  "cardhoarder"
+  "cardhoarder",
 ) as HTMLInputElement;
 
 const multicolorElement = document.getElementById(
-  "multicolor"
+  "multicolor",
 ) as HTMLInputElement;
 
 async function onToggleChanged(element: HTMLInputElement) {
@@ -29,6 +32,7 @@ async function onToggleChanged(element: HTMLInputElement) {
       tcgPlayer: tcgPlayerElement.checked,
       manaPool: manaPoolElement.checked,
       cardKingdom: cardKingdomElement.checked,
+      cardsphere: cardsphereElement.checked,
       cardmarket: cardmarketElement.checked,
       cardhoarder: cardhoarderElement.checked,
     },
@@ -49,7 +53,7 @@ function setupToggleButton(element: HTMLInputElement, checked: boolean) {
 async function main() {
   document.body.classList.toggle(
     "dark",
-    window.matchMedia("(prefers-color-scheme: dark)").matches
+    window.matchMedia("(prefers-color-scheme: dark)").matches,
   );
 
   const options = await getOptions();
@@ -57,6 +61,7 @@ async function main() {
   setupToggleButton(tcgPlayerElement, options.vendors.tcgPlayer);
   setupToggleButton(manaPoolElement, options.vendors.manaPool);
   setupToggleButton(cardKingdomElement, options.vendors.cardKingdom);
+  setupToggleButton(cardsphereElement, options.vendors.cardsphere);
   setupToggleButton(cardmarketElement, options.vendors.cardmarket);
   setupToggleButton(cardhoarderElement, options.vendors.cardhoarder);
   setupToggleButton(multicolorElement, options.multicolor);

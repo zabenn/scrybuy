@@ -1,6 +1,7 @@
 $vendors: (
   "mana-pool": #0095ff,
   "card-kingdom": #004285,
+  "cardsphere": #1abc9c,
 );
 
 @each $name, $color in $vendors {
