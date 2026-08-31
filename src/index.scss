@@ -25,3 +25,16 @@ html.loading body {
   visibility: hidden !important;
   background: transparent !important;
 }
+
+table.prints-table thead th:first-child,
+table.prints-table thead th:first-child > a,
+table.prints-table thead th:first-child > span,
+table.prints-table tbody td:first-child,
+table.prints-table tbody td:first-child > a,
+table.prints-table tbody td:first-child > span {
+  width: auto !important;
+  min-width: 0 !important;
+  white-space: normal !important;
+  overflow-wrap: anywhere !important;
+  word-break: break-word !important;
+}

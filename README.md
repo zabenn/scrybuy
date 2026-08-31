@@ -21,6 +21,11 @@ A Firefox/Chrome extension that adds store purchase links and pricing informatio
     <td align="center">➡</td>
     <td><img src="docs/prints_after.png" alt="Prints after" width="300" /></td>
   </tr>
+  <tr>
+    <td><img src="docs/checklist_before.png" alt="Prints before" width="300" /></td>
+    <td align="center">➡</td>
+    <td><img src="docs/checklist_after.png" alt="Prints after" width="300" /></td>
+  </tr>
 </table>
 
 ## Features
@@ -28,13 +33,14 @@ A Firefox/Chrome extension that adds store purchase links and pricing informatio
 - Adds purchase links for:
   - [Mana Pool](https://manapool.com)
   - [Card Kingdom](https://www.cardkingdom.com)
+  - [Cardsphere](https://www.cardsphere.com/)
 - Allows hiding individual marketplaces, including:
   - TCGplayer
   - Cardmarket
   - Cardhoarder
-- Shows price for both regular and foil versions.
-- Shows price on store buttons and in the prints section.
-- Shows price directly in Scryfall's checklist view.
+- Shows prices for both regular and foil versions.
+- Shows prices on store buttons and in the prints section.
+- Shows price directly in checklist view.
 
 ## Disclosure
 

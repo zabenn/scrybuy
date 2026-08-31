@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "ScryBuy",
-  "version": "2.3.0",
+  "version": "2.3.1",
   "description": "Adds and hides purchase links on Scryfall",
   "icons": {
     "48": "icons/icon48.png",
