@@ -592,6 +592,63 @@ function addChecklistButtons(
   }
 }
 
+function splitPrintsTable(tableElement: HTMLTableElement): void {
+  const splitElement = document.createElement("div");
+  splitElement.classList.add("prints-split");
+
+  const fixedTableElement = document.createElement("table");
+  fixedTableElement.className = tableElement.className;
+
+  const footerTableElement = document.createElement("table");
+  footerTableElement.className = tableElement.className;
+  const footerBodyElement = footerTableElement.createTBody();
+
+  const rowPairs: [HTMLTableRowElement, HTMLTableRowElement][] = [];
+  for (const sectionElement of [tableElement.tHead, ...tableElement.tBodies]) {
+    if (!sectionElement) {
+      continue;
+    }
+    const fixedSectionElement = sectionElement.cloneNode(
+      false,
+    ) as HTMLTableSectionElement;
+    fixedTableElement.appendChild(fixedSectionElement);
+
+    for (const rowElement of Array.from(sectionElement.rows)) {
+      if (rowElement.textContent.includes("View all prints")) {
+        rowElement.cells[0].colSpan = 1;
+        footerBodyElement.appendChild(rowElement);
+        continue;
+      }
+      const fixedRowElement = rowElement.cloneNode(
+        false,
+      ) as HTMLTableRowElement;
+      fixedRowElement.appendChild(rowElement.cells[0]);
+      fixedSectionElement.appendChild(fixedRowElement);
+      rowPairs.push([fixedRowElement, rowElement]);
+    }
+  }
+
+  tableElement.replaceWith(splitElement);
+  splitElement.append(fixedTableElement, tableElement);
+  if (footerBodyElement.rows.length > 0) {
+    splitElement.after(footerTableElement);
+  }
+
+  splitElement.style.marginBottom = `-${tableElement.offsetHeight - tableElement.clientHeight}px`;
+
+  for (const rowPair of rowPairs) {
+    for (const rowElement of rowPair) {
+      rowElement.style.height = `${Math.max(rowPair[0].offsetHeight, rowPair[1].offsetHeight)}px`;
+      rowElement.addEventListener("mouseenter", () =>
+        rowPair.forEach((r) => r.classList.add("hover")),
+      );
+      rowElement.addEventListener("mouseleave", () =>
+        rowPair.forEach((r) => r.classList.remove("hover")),
+      );
+    }
+  }
+}
+
 async function timed<T>(label: string, fn: () => T | Promise<T>): Promise<T> {
   const start = performance.now();
   const result = await fn();
@@ -673,6 +730,12 @@ async function main() {
         options,
       ),
     );
+
+    await timed("splitPrintsTables", () => {
+      for (const printsTableElement of printsTableElements ?? []) {
+        splitPrintsTable(printsTableElement);
+      }
+    });
   } finally {
     document.documentElement.classList.remove("loading");
   }
