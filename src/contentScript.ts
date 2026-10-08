@@ -120,7 +120,7 @@ function getCurrencyAbbrev(vendor: Vendor): string {
   return "TIX";
 }
 
-function normalizeCurrencyClasses(tableElement: Element): void {
+function normalizeCurrencyClasses(tableElement: HTMLTableElement): void {
   for (const linkElement of tableElement.querySelectorAll<HTMLAnchorElement>(
     "a",
   )) {
@@ -135,41 +135,34 @@ function normalizeCurrencyClasses(tableElement: Element): void {
   }
 }
 
+function getRowCardUrl(rowElement: HTMLTableRowElement): string {
+  return rowElement.cells[0].querySelector<HTMLAnchorElement>(":scope > a")!
+    .href;
+}
+
 async function getUrlToPriceEntry(
-  printsBodyElements: Element[] | null,
-  checklistBodyElement: Element | null,
+  printsBodyElements: HTMLTableSectionElement[] | null,
+  checklistBodyElement: HTMLTableSectionElement | null,
 ): Promise<Record<string, PriceEntry>> {
   const urls: string[] = [];
   for (const printsBodyElement of printsBodyElements ?? []) {
-    for (const rowElement of printsBodyElement.querySelectorAll<HTMLTableRowElement>(
-      ":scope > tr",
-    )) {
+    for (const rowElement of printsBodyElement.rows) {
       if (rowElement.textContent?.includes("View all prints")) {
         continue;
       }
-      urls.push(
-        rowElement.querySelector<HTMLAnchorElement>(
-          ":scope > td:first-child > a",
-        )!.href,
-      );
+      urls.push(getRowCardUrl(rowElement));
     }
   }
-  for (const rowElement of checklistBodyElement?.querySelectorAll<HTMLTableRowElement>(
-    ":scope > tr",
-  ) || []) {
-    urls.push(
-      rowElement.querySelector<HTMLAnchorElement>(
-        ":scope > td:first-child > a",
-      )!.href,
-    );
+  for (const rowElement of checklistBodyElement?.rows ?? []) {
+    urls.push(getRowCardUrl(rowElement));
   }
   return await fetchPrices(urls);
 }
 
 function getExistingStoreListItem(
   vendor: Vendor,
-  storesElement: Element,
-): Element | null {
+  storesElement: HTMLUListElement,
+): HTMLLIElement | null {
   if (vendor === "tcgPlayer")
     return storesElement.querySelector<HTMLLIElement>(
       ":scope > li:has(> a.tcgplayer)",
@@ -187,8 +180,8 @@ function getExistingStoreListItem(
 
 function getStoreInsertBeforeItem(
   vendor: Vendor,
-  storesElement: Element,
-): Element | null {
+  storesElement: HTMLUListElement,
+): HTMLLIElement | null {
   if (usdVendors.has(vendor)) {
     return (
       getExistingStoreListItem("cardmarket", storesElement) ??
@@ -201,7 +194,7 @@ function getStoreInsertBeforeItem(
   return null;
 }
 
-function findLabelElement(cell: Element): HTMLElement | null {
+function findLabelElement(cell: HTMLTableCellElement): HTMLElement | null {
   return (
     cell.querySelector<HTMLElement>(":scope > span") ??
     cell.querySelector<HTMLElement>(":scope abbr")
@@ -209,10 +202,10 @@ function findLabelElement(cell: Element): HTMLElement | null {
 }
 
 function findColumnIndexByLabel(
-  printsHeadElement: Element,
+  printsHeadElement: HTMLTableRowElement,
   label: string,
 ): number | null {
-  const index = Array.from(printsHeadElement.children).findIndex(
+  const index = Array.from(printsHeadElement.cells).findIndex(
     (cell) => findLabelElement(cell)?.textContent === label,
   );
   return index === -1 ? null : index;
@@ -220,7 +213,7 @@ function findColumnIndexByLabel(
 
 function getExistingVendorColumnIndex(
   vendor: Vendor,
-  printsHeadElement: Element,
+  printsHeadElement: HTMLTableRowElement,
 ): number | null {
   if (vendor === "tcgPlayer")
     return findColumnIndexByLabel(printsHeadElement, "USD");
@@ -233,22 +226,22 @@ function getExistingVendorColumnIndex(
 
 function getInsertBeforeColumnIndex(
   vendor: Vendor,
-  printsHeadElement: Element,
+  printsHeadElement: HTMLTableRowElement,
 ): number {
   if (usdVendors.has(vendor)) {
     return (
       findColumnIndexByLabel(printsHeadElement, "EUR") ??
       findColumnIndexByLabel(printsHeadElement, "TIX") ??
-      printsHeadElement.children.length
+      printsHeadElement.cells.length
     );
   }
   if (eurVendors.has(vendor)) {
     return (
       findColumnIndexByLabel(printsHeadElement, "TIX") ??
-      printsHeadElement.children.length
+      printsHeadElement.cells.length
     );
   }
-  return printsHeadElement.children.length;
+  return printsHeadElement.cells.length;
 }
 
 function getAffiliateUrl(vendor: Vendor, url: string): string {
@@ -256,7 +249,7 @@ function getAffiliateUrl(vendor: Vendor, url: string): string {
 }
 
 function changeToolboxButtons(
-  toolboxElement: Element | null,
+  toolboxElement: HTMLUListElement | null,
   options: Options,
 ): void {
   if (!toolboxElement) {
@@ -274,8 +267,8 @@ function changeToolboxButtons(
 }
 
 function addStoreButtons(
-  storesElement: Element | null,
-  printsBodyElement: Element | null,
+  storesElement: HTMLUListElement | null,
+  printsBodyElement: HTMLTableSectionElement | null,
   urlToPriceEntry: Record<string, PriceEntry>,
   options: Options,
 ): void {
@@ -384,7 +377,7 @@ function addStoreButtons(
 
 function buildPriceLinkElement(
   vendor: Vendor,
-  rowElement: Element,
+  rowElement: HTMLTableRowElement,
   urlToPriceEntry: Record<string, PriceEntry>,
   options: Options,
   flags: SingleColumnFlags,
@@ -400,11 +393,7 @@ function buildPriceLinkElement(
   }
 
   const vendorEntry =
-    urlToPriceEntry[
-      rowElement.querySelector<HTMLAnchorElement>(
-        ":scope > td:first-child > a",
-      )!.href
-    ]?.[vendor as keyof PriceEntry];
+    urlToPriceEntry[getRowCardUrl(rowElement)]?.[vendor as keyof PriceEntry];
   const titleParts: string[] = [];
   for (const [finish, value] of Object.entries(
     vendorEntry ?? [],
@@ -428,9 +417,9 @@ function buildPriceLinkElement(
 }
 
 function addPrintButtons(
-  printsTableElements: Element[] | null,
-  printsHeadElements: Element[] | null,
-  printsBodyElements: Element[] | null,
+  printsTableElements: HTMLTableElement[] | null,
+  printsHeadElements: HTMLTableRowElement[] | null,
+  printsBodyElements: HTMLTableSectionElement[] | null,
   urlToPriceEntry: Record<string, PriceEntry>,
   options: Options,
 ): void {
@@ -455,19 +444,15 @@ function addPrintButtons(
       let columnElement: HTMLTableCellElement;
       if (existingVendors.has(vendor)) {
         const index = getExistingVendorColumnIndex(vendor, printsHeadElement)!;
-        columnElement = printsHeadElement.children[
-          index
-        ] as HTMLTableCellElement;
+        columnElement = printsHeadElement.cells[index];
         const spanElement = findLabelElement(columnElement)!;
         if (!enabled) {
-          printsHeadElement.removeChild(columnElement);
-          for (const rowElement of printsBodyElement.querySelectorAll<HTMLTableRowElement>(
-            ":scope > tr",
-          )) {
+          printsHeadElement.deleteCell(index);
+          for (const rowElement of printsBodyElement.rows) {
             if (rowElement.textContent.includes("View all prints")) {
               continue;
             }
-            rowElement.removeChild(rowElement.children[index]);
+            rowElement.deleteCell(index);
           }
         } else if (!isSingleColumnVendor(vendor, flags)) {
           spanElement.textContent = existingVendorAbbrev[vendor]!;
@@ -488,35 +473,28 @@ function addPrintButtons(
 
         printsHeadElement.insertBefore(
           columnElement,
-          printsHeadElement.children[beforeIndex],
+          printsHeadElement.cells[beforeIndex],
         );
 
-        for (const rowElement of printsBodyElement.querySelectorAll<HTMLTableRowElement>(
-          ":scope > tr",
-        )) {
+        for (const rowElement of printsBodyElement.rows) {
           if (rowElement.textContent.includes("View all prints")) {
-            rowElement.querySelector<HTMLTableCellElement>(
-              ":scope > td:first-child",
-            )!.colSpan =
+            rowElement.cells[0].colSpan =
               Object.values(options.vendors).filter((enabled) => enabled)
                 .length + 1;
             continue;
           }
 
-          const cellElement = document.createElement("td");
-          cellElement.appendChild(
-            buildPriceLinkElement(
-              vendor,
-              rowElement,
-              urlToPriceEntry,
-              options,
-              flags,
-            ),
-          );
-          rowElement.insertBefore(
-            cellElement,
-            rowElement.children[beforeIndex],
-          );
+          rowElement
+            .insertCell(beforeIndex)
+            .appendChild(
+              buildPriceLinkElement(
+                vendor,
+                rowElement,
+                urlToPriceEntry,
+                options,
+                flags,
+              ),
+            );
         }
       }
     }
@@ -524,9 +502,9 @@ function addPrintButtons(
 }
 
 function addChecklistButtons(
-  checklistTableElement: Element | null,
-  checklistHeadElement: Element | null,
-  checklistBodyElement: Element | null,
+  checklistTableElement: HTMLTableElement | null,
+  checklistHeadElement: HTMLTableRowElement | null,
+  checklistBodyElement: HTMLTableSectionElement | null,
   urlToPriceEntry: Record<string, PriceEntry>,
   options: Options,
 ): void {
@@ -544,7 +522,7 @@ function addChecklistButtons(
 
   const flags = computeSingleColumnFlags(options);
 
-  const sortUsdHref = Array.from(checklistHeadElement.children)
+  const sortUsdHref = Array.from(checklistHeadElement.cells)
     .find((cell) => findLabelElement(cell)?.textContent === "USD")
     ?.querySelector<HTMLAnchorElement>(":scope > a")!.href!;
   const usdArrowElement = document.URL.includes("order=usd")
@@ -557,16 +535,12 @@ function addChecklistButtons(
     let columnElement: HTMLTableCellElement;
     if (existingVendors.has(vendor)) {
       const index = getExistingVendorColumnIndex(vendor, checklistHeadElement)!;
-      columnElement = checklistHeadElement.children[
-        index
-      ] as HTMLTableCellElement;
+      columnElement = checklistHeadElement.cells[index];
       const anchorElement = findLabelElement(columnElement)!;
       if (!enabled) {
-        checklistHeadElement.removeChild(columnElement);
-        for (const rowElement of checklistBodyElement.querySelectorAll<HTMLTableRowElement>(
-          ":scope > tr",
-        )) {
-          rowElement.removeChild(rowElement.children[index]);
+        checklistHeadElement.deleteCell(index);
+        for (const rowElement of checklistBodyElement.rows) {
+          rowElement.deleteCell(index);
         }
       } else if (!isSingleColumnVendor(vendor, flags)) {
         anchorElement.textContent = existingVendorAbbrev[vendor]!;
@@ -598,13 +572,11 @@ function addChecklistButtons(
 
       checklistHeadElement.insertBefore(
         columnElement,
-        checklistHeadElement.children[beforeIndex],
+        checklistHeadElement.cells[beforeIndex],
       );
 
-      for (const rowElement of checklistBodyElement.querySelectorAll<HTMLTableRowElement>(
-        ":scope > tr",
-      )) {
-        const cellElement = document.createElement("td");
+      for (const rowElement of checklistBodyElement.rows) {
+        const cellElement = rowElement.insertCell(beforeIndex);
         cellElement.classList.add("right");
         cellElement.appendChild(
           buildPriceLinkElement(
@@ -615,7 +587,6 @@ function addChecklistButtons(
             flags,
           ),
         );
-        rowElement.insertBefore(cellElement, rowElement.children[beforeIndex]);
       }
     }
   }
@@ -639,35 +610,25 @@ async function main() {
         .querySelector<HTMLDivElement>("#stores")
         ?.querySelector<HTMLUListElement>(":scope > ul.toolbox-links") ?? null;
 
-    let printsTableElements: Element[] | null = Array.from(
+    let printsTableElements: HTMLTableElement[] | null = Array.from(
       document.querySelectorAll<HTMLTableElement>(".prints table.prints-table"),
     ).filter((table) => table.innerHTML.includes("Prints"));
     if (printsTableElements?.length === 0) {
       printsTableElements = null;
     }
-    const printsHeadElements: Element[] | null =
-      printsTableElements?.map((printsTableElement) =>
-        printsTableElement.querySelector<HTMLTableRowElement>(
-          ":scope > thead > tr",
-        )!,
+    const printsHeadElements: HTMLTableRowElement[] | null =
+      printsTableElements?.map(
+        (printsTableElement) => printsTableElement.tHead!.rows[0],
       ) ?? null;
-    const printsBodyElements: Element[] | null =
-      printsTableElements?.map((printsTableElement) =>
-        printsTableElement.querySelector<HTMLTableSectionElement>(
-          ":scope > tbody",
-        )!,
+    const printsBodyElements: HTMLTableSectionElement[] | null =
+      printsTableElements?.map(
+        (printsTableElement) => printsTableElement.tBodies[0],
       ) ?? null;
 
     const checklistTableElement =
       document.querySelector<HTMLTableElement>("table.checklist") ?? null;
-    const checklistHeadElement =
-      checklistTableElement?.querySelector<HTMLTableRowElement>(
-        ":scope > thead > tr",
-      ) ?? null;
-    const checklistBodyElement =
-      checklistTableElement?.querySelector<HTMLTableSectionElement>(
-        ":scope > tbody",
-      ) ?? null;
+    const checklistHeadElement = checklistTableElement?.tHead?.rows[0] ?? null;
+    const checklistBodyElement = checklistTableElement?.tBodies[0] ?? null;
 
     const options = await timed("getOptions", () => getOptions());
 
