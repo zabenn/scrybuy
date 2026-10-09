@@ -26,6 +26,8 @@ html.loading body {
   background: transparent !important;
 }
 
+$row-highlight-opaque: #f2eafd;
+
 .prints-split {
   display: flex;
   align-items: flex-start;
@@ -40,6 +42,13 @@ html.loading body {
 
       tr {
         border-right: 0;
+      }
+
+      th,
+      td {
+        width: var(--first-column-width);
+        min-width: var(--first-column-width);
+        max-width: var(--first-column-width);
       }
     }
 
@@ -65,6 +74,69 @@ html.loading body {
       a,
       span {
         text-align: right;
+      }
+
+      thead tr {
+        --fade-color: #343242;
+      }
+
+      tbody tr {
+        --fade-color: #ffffff;
+
+        &.current,
+        &.hover {
+          --fade-color: #{$row-highlight-opaque};
+        }
+      }
+
+      td.scroll-fade {
+        position: sticky;
+        z-index: 1;
+        width: 0;
+        min-width: 0;
+        padding: 0;
+
+        &::after {
+          content: "";
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          width: 24px;
+          pointer-events: none;
+          opacity: 0;
+          transition: opacity 0.15s;
+        }
+
+        &:first-child {
+          left: 0;
+
+          &::after {
+            left: 0;
+            background: linear-gradient(
+              to right,
+              var(--fade-color),
+              transparent
+            );
+          }
+        }
+
+        &:last-child {
+          right: 0;
+
+          &::after {
+            right: 0;
+            background: linear-gradient(
+              to left,
+              var(--fade-color),
+              transparent
+            );
+          }
+        }
+      }
+
+      &.scroll-left td.scroll-fade:first-child::after,
+      &.scroll-right td.scroll-fade:last-child::after {
+        opacity: 1;
       }
     }
 

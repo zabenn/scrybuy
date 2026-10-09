@@ -5,7 +5,7 @@ import { PriceEntry } from "./types";
 
 const client = createClient<paths>({
   baseUrl: "https://scrybuy-api.onrender.com/",
-  headers: { "User-Agent": "ScryBuy/2.3.2" },
+  headers: { "User-Agent": "ScryBuy/2.3.3" },
 });
 
 const MAX_FETCH_ATTEMPTS = 3;

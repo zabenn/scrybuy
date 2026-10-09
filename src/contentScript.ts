@@ -438,6 +438,11 @@ function addPrintButtons(
       normalizeCurrencyClasses(printsTableElement);
     }
 
+    printsTableElement.style.setProperty(
+      "--first-column-width",
+      `${printsHeadElement.cells[0].getBoundingClientRect().width}px`,
+    );
+
     for (const [vendor, enabled] of Object.entries(options.vendors) as Entries<
       Record<Vendor, boolean>
     >) {
@@ -592,60 +597,93 @@ function addChecklistButtons(
   }
 }
 
-function splitPrintsTable(tableElement: HTMLTableElement): void {
-  const splitElement = document.createElement("div");
-  splitElement.classList.add("prints-split");
-
-  const fixedTableElement = document.createElement("table");
-  fixedTableElement.className = tableElement.className;
-
-  const footerTableElement = document.createElement("table");
-  footerTableElement.className = tableElement.className;
-  const footerBodyElement = footerTableElement.createTBody();
-
-  const rowPairs: [HTMLTableRowElement, HTMLTableRowElement][] = [];
-  for (const sectionElement of [tableElement.tHead, ...tableElement.tBodies]) {
-    if (!sectionElement) {
+function splitPrintsTables(
+  printsTableElements: HTMLTableElement[] | null,
+): void {
+  for (const tableElement of printsTableElements ?? []) {
+    if (tableElement.rows[0].cells.length <= 4) {
       continue;
     }
-    const fixedSectionElement = sectionElement.cloneNode(
-      false,
-    ) as HTMLTableSectionElement;
-    fixedTableElement.appendChild(fixedSectionElement);
 
-    for (const rowElement of Array.from(sectionElement.rows)) {
-      if (rowElement.textContent.includes("View all prints")) {
-        rowElement.cells[0].colSpan = 1;
-        footerBodyElement.appendChild(rowElement);
+    const splitElement = document.createElement("div");
+    splitElement.classList.add("prints-split");
+    splitElement.style.setProperty(
+      "--first-column-width",
+      tableElement.style.getPropertyValue("--first-column-width"),
+    );
+
+    const fixedTableElement = document.createElement("table");
+    fixedTableElement.className = tableElement.className;
+
+    const footerTableElement = document.createElement("table");
+    footerTableElement.className = tableElement.className;
+    const footerBodyElement = footerTableElement.createTBody();
+
+    const rowPairs: [HTMLTableRowElement, HTMLTableRowElement][] = [];
+    for (const sectionElement of [
+      tableElement.tHead,
+      ...tableElement.tBodies,
+    ]) {
+      if (!sectionElement) {
         continue;
       }
-      const fixedRowElement = rowElement.cloneNode(
+      const fixedSectionElement = sectionElement.cloneNode(
         false,
-      ) as HTMLTableRowElement;
-      fixedRowElement.appendChild(rowElement.cells[0]);
-      fixedSectionElement.appendChild(fixedRowElement);
-      rowPairs.push([fixedRowElement, rowElement]);
+      ) as HTMLTableSectionElement;
+      fixedTableElement.appendChild(fixedSectionElement);
+
+      for (const rowElement of Array.from(sectionElement.rows)) {
+        if (rowElement.textContent.includes("View all prints")) {
+          rowElement.cells[0].colSpan = 1;
+          footerBodyElement.appendChild(rowElement);
+          continue;
+        }
+        const fixedRowElement = rowElement.cloneNode(
+          false,
+        ) as HTMLTableRowElement;
+        fixedRowElement.appendChild(rowElement.cells[0]);
+        fixedSectionElement.appendChild(fixedRowElement);
+        rowPairs.push([fixedRowElement, rowElement]);
+      }
     }
-  }
 
-  tableElement.replaceWith(splitElement);
-  splitElement.append(fixedTableElement, tableElement);
-  if (footerBodyElement.rows.length > 0) {
-    splitElement.after(footerTableElement);
-  }
-
-  splitElement.style.marginBottom = `-${tableElement.offsetHeight - tableElement.clientHeight}px`;
-
-  for (const rowPair of rowPairs) {
-    for (const rowElement of rowPair) {
-      rowElement.style.height = `${Math.max(rowPair[0].offsetHeight, rowPair[1].offsetHeight)}px`;
-      rowElement.addEventListener("mouseenter", () =>
-        rowPair.forEach((r) => r.classList.add("hover")),
-      );
-      rowElement.addEventListener("mouseleave", () =>
-        rowPair.forEach((r) => r.classList.remove("hover")),
-      );
+    tableElement.replaceWith(splitElement);
+    splitElement.append(fixedTableElement, tableElement);
+    if (footerBodyElement.rows.length > 0) {
+      splitElement.after(footerTableElement);
     }
+
+    splitElement.style.marginBottom = `-${tableElement.offsetHeight - tableElement.clientHeight}px`;
+
+    for (const rowPair of rowPairs) {
+      for (const rowElement of rowPair) {
+        rowElement.style.height = `${Math.max(rowPair[0].offsetHeight, rowPair[1].offsetHeight)}px`;
+        rowElement.addEventListener("mouseenter", () =>
+          rowPair.forEach((r) => r.classList.add("hover")),
+        );
+        rowElement.addEventListener("mouseleave", () =>
+          rowPair.forEach((r) => r.classList.remove("hover")),
+        );
+      }
+    }
+
+    for (const rowElement of tableElement.rows) {
+      rowElement.insertCell(0).classList.add("scroll-fade");
+      rowElement.insertCell().classList.add("scroll-fade");
+    }
+
+    const updateScrollFades = () => {
+      tableElement.classList.toggle("scroll-left", tableElement.scrollLeft > 0);
+      tableElement.classList.toggle(
+        "scroll-right",
+        tableElement.scrollLeft + tableElement.clientWidth <
+          tableElement.scrollWidth - 1,
+      );
+    };
+    tableElement.addEventListener("scroll", updateScrollFades, {
+      passive: true,
+    });
+    new ResizeObserver(updateScrollFades).observe(tableElement);
   }
 }
 
@@ -731,11 +769,9 @@ async function main() {
       ),
     );
 
-    await timed("splitPrintsTables", () => {
-      for (const printsTableElement of printsTableElements ?? []) {
-        splitPrintsTable(printsTableElement);
-      }
-    });
+    await timed("splitPrintsTables", () =>
+      splitPrintsTables(printsTableElements),
+    );
   } finally {
     document.documentElement.classList.remove("loading");
   }
